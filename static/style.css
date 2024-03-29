@@ -1,0 +1,50 @@
+/* style.css */
+
+body {
+    text-align: center; /* Center-align text */
+}
+
+h1 {
+    background-color: rgb(71, 71, 83); /* Blue background color */
+    color: white; /* White text color */
+    padding: 10px; /* Add padding for better appearance */
+}
+
+table {
+    margin: 0 auto; /* Center-align table */
+}
+
+
+
+
+.pagination {
+    display: flex; /* Use flexbox layout */
+    justify-content: center; /* Center-align items horizontally */
+    position: sticky; /* Sticky positioning */
+    bottom: 0px; /* Distance from the bottom of the viewport */
+    background-color: #fff; /* Background color */
+    padding: 10px; /* Padding */
+    z-index: 1000; /* Ensure it's above other elements */
+   
+}
+
+.step-links {
+    display: flex; /* Use flexbox layout */
+    align-items: center; /* Center-align items vertically */
+}
+
+.pagination-link {
+    margin: 0 10px; /* Add some spacing between links */
+    color: #007bff; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.pagination-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+.current {
+    margin: 0 10px; /* Add some spacing */
+    font-weight: bold; /* Bold text */
+}
+

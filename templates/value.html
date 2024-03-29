@@ -1,0 +1,95 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Value</title>
+</head>
+<body>
+    <body>
+        <h1>Maximum Value Information</h1>
+        <p>Maximum Value: {{ max_value }}</p>
+        <p>Minimum Value: {{ min_value }}</p>
+        <p>Average Value: {{ average_value }}</p>
+    </body> 
+</body>
+</html> -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Value</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Data Information</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>January</th>
+                    <th>February</th>
+                    <th>March</th>
+                    <th>April</th>
+                    <th>May</th>
+                    <th>June</th>
+                    <th>July</th>
+                    <th>August</th>
+                    <th>September</th>
+                    <th>October</th>
+                    <th>November</th>
+                    <th>December</th>
+                    <th>Winter</th>
+                    <th>Spring</th>
+                    <th>Summer</th>
+                    <th>Autumn</th>
+                    <th>Annual</th>
+                    <th>Max</th>
+                    <th>Min</th>
+                    <th>Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ year }}</td>
+                    {% for month, value in monthly_values %}
+                        <td>{{ value }}</td> 
+                    {% endfor %}
+                    {% for value in season_value %}
+                    <td>{{ value }}</td> 
+                    
+                {% endfor %}
+                    
+                    {% for value in annual_value %}
+                        <td>{{ value }}</td> 
+                        
+                    {% endfor %}
+                    <td>{{ max_value }}</td> 
+                    <td>{{ min_value }}</td> 
+                    <td>{{ average_value }}</td> 
+                </tr>
+            </tbody>
+            <div id="chart-container">
+                <img id="chart-img" src="{% static 'images/chart.png' %}" alt="Chart">
+            </div>
+            
+            
+        </table>
+</body>
+</html>
