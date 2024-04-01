@@ -1,95 +1,277 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Value</title>
-</head>
-<body>
-    <body>
-        <h1>Maximum Value Information</h1>
-        <p>Maximum Value: {{ max_value }}</p>
-        <p>Minimum Value: {{ min_value }}</p>
-        <p>Average Value: {{ average_value }}</p>
-    </body> 
-</body>
-</html> -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Value</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <style>
+
+    </style>
+
+
     <style>
         table {
             border-collapse: collapse;
             width: 100%;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #dddddd;
             text-align: center;
             padding: 8px;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
+        #container {
+            height: 400px;
+        }
+
+        .highcharts-figure,
+        .highcharts-data-table table {
+            min-width: 310px;
+            max-width: 800px;
+            margin: 1em auto;
+        }
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table td,
+        .highcharts-data-table th,
+        .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table thead tr,
+        .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+
+        .pagination {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pagination .page-link {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 0 4px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f0f0f0;
+        }
     </style>
 
+
 </head>
+
 <body>
     <h1>Data Information</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Year</th>
-                    <th>January</th>
-                    <th>February</th>
-                    <th>March</th>
-                    <th>April</th>
-                    <th>May</th>
-                    <th>June</th>
-                    <th>July</th>
-                    <th>August</th>
-                    <th>September</th>
-                    <th>October</th>
-                    <th>November</th>
-                    <th>December</th>
-                    <th>Winter</th>
-                    <th>Spring</th>
-                    <th>Summer</th>
-                    <th>Autumn</th>
-                    <th>Annual</th>
-                    <th>Max</th>
-                    <th>Min</th>
-                    <th>Average</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ year }}</td>
-                    {% for month, value in monthly_values %}
-                        <td>{{ value }}</td> 
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="regionSelect" class="form-label">Select Region:</label>
+                <select id="regionSelect" class="form-select">
+                    <option selected disabled>Select Region</option>
+                    {% for region in regions %}
+                    <option value="{{ region.id }}">{{ region.name }}</option>
                     {% endfor %}
-                    {% for value in season_value %}
-                    <td>{{ value }}</td> 
-                    
-                {% endfor %}
-                    
-                    {% for value in annual_value %}
-                        <td>{{ value }}</td> 
-                        
-                    {% endfor %}
-                    <td>{{ max_value }}</td> 
-                    <td>{{ min_value }}</td> 
-                    <td>{{ average_value }}</td> 
-                </tr>
-            </tbody>
-            <div id="chart-container">
-                <img id="chart-img" src="{% static 'images/chart.png' %}" alt="Chart">
+                </select>
             </div>
-            
-            
-        </table>
+            <div class="col-md-6">
+                <label for="parameterSelect" class="form-label">Select Parameter:</label>
+                <select id="parameterSelect" class="form-select">
+                    <option selected disabled>Select Parameter</option>
+                    {% for parameter in parameters %}
+                    <option value="{{ parameter.id }}">{{ parameter.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+
+                {% for parameter in parameters %}
+                <option value="{{ parameter.id }}">{{ parameter.name }}</option>
+                {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <hr>
+    </hr>
+    <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>January</th>
+                <th>February</th>
+                <th>March</th>
+                <th>April</th>
+                <th>May</th>
+                <th>June</th>
+                <th>July</th>
+                <th>August</th>
+                <th>September</th>
+                <th>October</th>
+                <th>November</th>
+                <th>December</th>
+                <th>Winter</th>
+                <th>Spring</th>
+                <th>Summer</th>
+                <th>Autumn</th>
+                <th>Annual</th>
+                <th>Max</th>
+                <th>Min</th>
+                <th>Average</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, data in page_obj %}
+            <tr>
+                <td>{{year}}</td>
+                <td>{{ data.monthly.jan }}</td>
+                <td>{{ data.monthly.feb }}</td>
+                <td>{{ data.monthly.mar }}</td>
+                <td>{{ data.monthly.apr }}</td>
+                <td>{{ data.monthly.may }}</td>
+                <td>{{ data.monthly.jun }}</td>
+                <td>{{ data.monthly.jul }}</td>
+                <td>{{ data.monthly.aug }}</td>
+                <td>{{ data.monthly.sep }}</td>
+                <td>{{ data.monthly.oct }}</td>
+                <td>{{ data.monthly.nov }}</td>
+                <td>{{ data.monthly.dec }}</td>
+                <td>{{ data.seasonal.Winter }}</td>
+                <td>{{ data.seasonal.Spring }}</td>
+                <td>{{ data.seasonal.Summer }}</td>
+                <td>{{ data.seasonal.Autumn }}</td>
+                <td>{{ data.annual }}</td>
+                <td>{{ data.max }}</td>
+                <td>{{ data.min }}</td>
+                <td>{{ data.avg }}</td>
+
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-link">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a>
+            {% endif %}
+
+            <span class="current-page">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+    <hr>
+
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+
+    </figure>
+    <hr>
+    <div id="container"></div>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var data = [
+                {% for year, data in page_obj %}
+                { year: "{{ year }}", max: {{ data.max }}, min: {{ data.min }}, avg: {{ data.avg }} },
+            {% endfor %}
+        ];
+
+        // Sort the data by year in ascending order
+        data.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Weather Data'
+            },
+            xAxis: {
+                title: {
+                    text: 'Year'
+                },
+                categories: data.map(item => item.year)
+            },
+            yAxis: {
+                title: {
+                    text: 'Value'
+                }
+            },
+            series: [{
+                name: 'Max Parameter Value',
+                data: data.map(item => parseFloat(item.max))
+            }, {
+                name: 'Min Parameter Value',
+                data: data.map(item => parseFloat(item.min))
+            }, {
+                name: 'Avg Parameter Value',
+                data: data.map(item => parseFloat(item.avg))
+            }]
+        });
+    });
+    </script>
+
+
 </body>
+
 </html>

@@ -5,5 +5,5 @@ from .import views
 
 urlpatterns = [
     path('api/', views.fetch_data_view, name='metoffice_data'),
-    path('year-value/<int:year>/<str:parameter>/<str:region>/', views.get_yearwise_data, name='get_yearwise_data'),
+    path('data/<str:parameter>/<str:region>/', views.get_region_parameter_data, name='region_parameter_data'),
 ]
