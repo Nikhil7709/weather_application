@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Weather Data</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <label for="regionSelect" class="form-label">Select Region:</label>
+            <select id="regionSelect" class="form-select">
+                <option selected disabled>Select Region</option>
+                {% for region in regions %}
+                <option value="{{ region.id }}">{{ region.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="parameterSelect" class="form-label">Select
+                Parameter:</label>
+            <select id="parameterSelect" class="form-select">
+                <option selected disabled>Select Parameter</option>
+                {% for parameter in parameters %}
+                <option value="{{ parameter.id }}">{{ parameter.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <button type="submit" class="btn btn-primary">
+                Submit
+            </button>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tabular" role="tabpanel"
+        aria-labelledby="tabular-tab">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button id="showTabularData" class="btn btn-primary btn-lg">Show
+                Tabular Data</button>
+            <button id="showGraphicalData" class="btn btn-primary btn-lg">Show
+                Graphical Data</button>
+        </div>
+        <div id="tabularData" style="display: none;">
+            {% include 'tabular_format.html' %}
+        </div>
+        <div id="graphicalData" style="display: none;">
+            {% include 'graphical_format.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to toggle the visibility of tabular data
+    document.getElementById('showTabularData').addEventListener('click', function () {
+        var tabularData = document.getElementById('tabularData');
+        var graphicalData = document.getElementById('graphicalData');
+        
+        tabularData.style.display = 'block';
+        graphicalData.style.display = 'none';
+    });
+
+    // Function to toggle the visibility of graphical data
+    document.getElementById('showGraphicalData').addEventListener('click', function () {
+        var tabularData = document.getElementById('tabularData');
+        var graphicalData = document.getElementById('graphicalData');
+        
+        tabularData.style.display = 'none';
+        graphicalData.style.display = 'block';
+    });
+</script>
+{% endblock %}

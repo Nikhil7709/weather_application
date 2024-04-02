@@ -1,10 +1,18 @@
-from collections import defaultdict
 from statistics import mean
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.db.models.signals import post_migrate
 
-from .models import Region, Parameter, Season, SeasonalData, Year, Month , MonthlyData, AnnualData, Annual
+from .models import (
+    Region,
+    Parameter,
+    Season,
+    SeasonalData,
+    Year,
+    Month,
+    MonthlyData,
+    AnnualData,
+    Annual,
+)
 from .utils import scrape_data
 from django.db.utils import IntegrityError
 from django.dispatch import receiver
@@ -14,6 +22,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def fetch_data_view(request):
     regions = Region.objects.all()
     parameters = Parameter.objects.all()
@@ -22,17 +31,21 @@ def fetch_data_view(request):
         for parameter in parameters:
             data = scrape_data(region.name, parameter.name)
             if data is None:
-                logger.error(f"Failed to retrieve data for {region.name} - {parameter.name}")
+                logger.error(
+                    f"Failed to retrieve data for {region.name} - {parameter.name}"
+                )
                 continue
 
-            lines = data.strip().split('\n')
+            lines = data.strip().split("\n")
             if len(lines) < 7:
-                logger.error(f"Invalid data format for {region.name} - {parameter.name}")
+                logger.error(
+                    f"Invalid data format for {region.name} - {parameter.name}"
+                )
                 continue
 
             years = []
-            seasonal_data_dict = {} 
-           
+            seasonal_data_dict = {}
+
             # Extract years and corresponding seasonal data
             for line in lines[6:]:
                 parts = line.split()
@@ -51,17 +64,19 @@ def fetch_data_view(request):
                 try:
                     # Get or create the Year object
                     year_obj, _ = Year.objects.get_or_create(year=year)
-                    
+
                     # Get seasonal data for the current year
                     seasonal_data = seasonal_data_dict.get(year)
                     print("at line 54", seasonal_data)
 
                     if seasonal_data and len(seasonal_data) >= 16:
-                       
-                        seasonal_data = [None if value == '---' else value for value in seasonal_data]
+
+                        seasonal_data = [
+                            None if value == "---" else value for value in seasonal_data
+                        ]
                         seasons = Season.objects.all()
-                       
-                        # store the seasonal data   
+
+                        # store the seasonal data
                         for season in seasons:
                             value = seasonal_data[season.column]
                             SeasonalData.objects.get_or_create(
@@ -69,10 +84,10 @@ def fetch_data_view(request):
                                 region=region,
                                 params=parameter,
                                 season=season,
-                                value=value
+                                value=value,
                             )
-                        
-                        # store the monthly data   
+
+                        # store the monthly data
                         months = Month.objects.all()
                         for month, season in zip(Month.objects.all(), months):
                             value = seasonal_data[month.column]
@@ -81,14 +96,14 @@ def fetch_data_view(request):
                                 year=year_obj,
                                 region=region,
                                 params=parameter,
-                                month=month,  
-                                value=value
+                                month=month,
+                                value=value,
                             )
 
                         # store anuual data
                         annual = Annual.objects.all()
                         for ann in annual:
-                            values=seasonal_data[ann.column]
+                            values = seasonal_data[ann.column]
 
                         annual, _ = AnnualData.objects.get_or_create(
                             value=values,
@@ -97,110 +112,149 @@ def fetch_data_view(request):
                             params=parameter,
                         )
                     else:
-                        print(f"No seasonal data found for year {year} in {region.name} - {parameter.name}")
+                        print(
+                            f"No seasonal data found for year {year} in {region.name} - {parameter.name}"
+                        )
 
                 except IntegrityError as e:
                     print(f"Error creating year {year}: {e}")
 
             print("Data saved successfully.")
-    return render(request, 'home.html')
+    return render(request, "home.html")
 
 
 def get_region_parameter_data(request, region, parameter):
-   
+    """
+    Show the all data on UI
+    """
     years = Year.objects.all()
-    year_list = [year for year in years] 
-    
+    year_list = [year for year in years]
+
     regions = Region.objects.all()
     parameters = Parameter.objects.all()
 
-    queryset_annual = AnnualData.objects.filter(params__name=parameter, region__name=region)
-    queryset_monthly = MonthlyData.objects.filter(params__name=parameter, region__name=region)
-    queryset_season = SeasonalData.objects.filter(params__name=parameter, region__name=region)
+    queryset_annual = AnnualData.objects.filter(
+        params__name=parameter, region__name=region
+    )
+    queryset_monthly = MonthlyData.objects.filter(
+        params__name=parameter, region__name=region
+    )
+    queryset_season = SeasonalData.objects.filter(
+        params__name=parameter, region__name=region
+    )
 
-    annual_data_dict = {}
-    monthly_data_dict = {}
-    season_data_dict = {}
-   
     data = {}
 
     # Concatenating Monthly Data
-    for monthly_data in queryset_monthly:    
+    for monthly_data in queryset_monthly:
         if monthly_data.year.year not in data:
             print("at line 178", monthly_data.year.year)
             data[monthly_data.year.year] = {}
-        if 'monthly' not in data[monthly_data.year.year]:
-            data[monthly_data.year.year]['monthly'] = {}
-        data[monthly_data.year.year]['monthly'][monthly_data.month.name] = monthly_data.value
-        print("at line 183", data[monthly_data.year.year]['monthly'][monthly_data.month.name])
+        if "monthly" not in data[monthly_data.year.year]:
+            data[monthly_data.year.year]["monthly"] = {}
+        data[monthly_data.year.year]["monthly"][
+            monthly_data.month.name
+        ] = monthly_data.value
+        print(
+            "at line 183",
+            data[monthly_data.year.year]["monthly"][monthly_data.month.name],
+        )
 
     # Concatenating Seasonal Data
     for season_data in queryset_season:
         if season_data.year.year not in data:
             data[season_data.year.year] = {}
-        if 'seasonal' not in data[season_data.year.year]:
-            data[season_data.year.year]['seasonal'] = {}
-        data[season_data.year.year]['seasonal'][season_data.season.name] = season_data.value
+        if "seasonal" not in data[season_data.year.year]:
+            data[season_data.year.year]["seasonal"] = {}
+        data[season_data.year.year]["seasonal"][
+            season_data.season.name
+        ] = season_data.value
 
     # Concatenating Annual Data
-    for annual_data in queryset_annual:    
+    for annual_data in queryset_annual:
         if annual_data.year.year not in data:
             data[annual_data.year.year] = {}
-        data[annual_data.year.year]['annual'] = annual_data.value
+        data[annual_data.year.year]["annual"] = annual_data.value
 
     ranges = []
     avg_values_rounded = []
 
-   # Calculate and print min, max, and average for each year
+    # Calculate and print min, max, and average for each year
     for year, year_data in data.items():
-        all_values = list(year_data['monthly'].values())
+        all_values = list(year_data["monthly"].values())
         min_value = min(all_values)
         max_value = max(all_values)
         avg_value = mean(all_values)
         avg_value_rounded = round(avg_value, 2)
-        print(f"Year: {year}, Min: {min_value}, Max: {max_value}, Avg: {avg_value_rounded}")
+        print(
+            f"Year: {year}, Min: {min_value}, Max: {max_value}, Avg: {avg_value_rounded}"
+        )
 
         # Concatenate min, max, and avg to the data dictionary
-        data[year]['min'] = min_value
-        data[year]['max'] = max_value
-        data[year]['avg'] = avg_value_rounded
+        data[year]["min"] = min_value
+        data[year]["max"] = max_value
+        data[year]["avg"] = avg_value_rounded
         avg_values_rounded.append(avg_value_rounded)
 
         ranges.append([min_value, max_value])
 
     avg_values_rounded_list = list(avg_values_rounded)
-   
-    context = {
-    'regions': regions,
-    'parameters': parameters,
-    'min_values': [min_value for item in data.values()],
-    'max_values': [max_value for item in data.values()],
-    'avg_values': [avg_value_rounded for item in data.values()]
-    }
-    print("At line 241", data)
 
-    page_number = request.GET.get('page', 1)
+    context = {
+        "regions": regions,
+        "parameters": parameters,
+        "min_values": [min_value for item in data.values()],
+        "max_values": [max_value for item in data.values()],
+        "avg_values": [avg_value_rounded for item in data.values()],
+    }
+
+    page_number = request.GET.get("page", 1)
     page_size = 5
     paginator = Paginator(list(data.items()), page_size)
     page_obj = paginator.get_page(page_number)
-    return render(request, 'value.html', {
-        'years': year_list,
-        'ranges': ranges,
-        'context':context,
-        'page_obj':page_obj
-    })
 
+    # return render(request, 'value.html', {
+    #     'years': year_list,
+    #     'ranges': ranges,
+    #     'context':context,
+    #     'page_obj':page_obj
+    # })
+
+    return render(
+        request,
+        "merge_page.html",
+        {
+            "years": year_list,
+            "ranges": ranges,
+            "context": context,
+            "page_obj": page_obj,
+        },
+    )
 
 
 def create_month_choices():
-    months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-    print("month",months)
+    months = [
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+    ]
+    print("month", months)
     for month in months:
         Month.objects.get_or_create(name=month)
+
 
 # Connect the function to the post_migrate signal
 @receiver(post_migrate)
 def post_migrate_handler(sender, **kwargs):
-    if sender.name == 'weather_app':
-        print('weather-app')
-        create_month_choices()  
+    if sender.name == "weather_app":
+        print("weather-app")
+        create_month_choices()

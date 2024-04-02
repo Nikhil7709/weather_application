@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Weather Data{% endblock %}</title>
+        <style>
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                th,
+                td {
+                    border: 1px solid #dddddd;
+                    text-align: center;
+                    padding: 8px;
+                }
+
+                th {
+                    background-color: #f2f2f2;
+                }
+
+                #container {
+                    height: 400px;
+                }
+
+                .highcharts-figure,
+                .highcharts-data-table table {
+                    min-width: 310px;
+                    max-width: 800px;
+                    margin: 1em auto;
+                }
+
+                .highcharts-data-table table {
+                    font-family: Verdana, sans-serif;
+                    border-collapse: collapse;
+                    border: 1px solid #ebebeb;
+                    margin: 10px auto;
+                    text-align: center;
+                    width: 100%;
+                    max-width: 500px;
+                }
+
+                .highcharts-data-table caption {
+                    padding: 1em 0;
+                    font-size: 1.2em;
+                    color: #555;
+                }
+
+                .highcharts-data-table th {
+                    font-weight: 600;
+                    padding: 0.5em;
+                }
+
+                .highcharts-data-table td,
+                .highcharts-data-table th,
+                .highcharts-data-table caption {
+                    padding: 0.5em;
+                }
+
+                .highcharts-data-table thead tr,
+                .highcharts-data-table tr:nth-child(even) {
+                    background: #f8f8f8;
+                }
+
+                .highcharts-data-table tr:hover {
+                    background: #f1f7ff;
+                }
+
+                .pagination {
+                    text-align: center;
+                    padding: 20px;
+                }
+
+                .pagination .page-link {
+                    padding: 8px 16px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    margin: 0 4px;
+                    text-decoration: none;
+                    color: #333;
+                }
+
+                .pagination .page-link:hover {
+                    background-color: #f0f0f0;
+                }
+
+
+                .form-select {
+                width: 100%;
+                padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+                font-size: 1rem;
+                font-weight: 400;
+                line-height: 1.5;
+                color: #495057;
+                background-color: #fff;
+                background-clip: padding-box;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                }
+
+                .btn-primary {
+                color: #fff;
+                background-color: #007bff;
+                border-color: #007bff;
+                padding: 0.375rem 0.75rem;
+                font-size: 1rem;
+                line-height: 1.5;
+                border-radius: 0.25rem;
+                cursor: pointer;
+                transition: all 0.15s ease-in-out;
+                }
+
+                .btn-primary:hover {
+                color: #fff;
+                background-color: #0056b3;
+                border-color: #0056b3;
+                }
+
+                .mt-3 {
+                margin-top: 1rem;
+                }
+    </style>
+
+    </head>
+    <body>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <script src="{% static 'js/scripts.js' %}"></script>
+    </body>
+</html>

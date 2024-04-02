@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Data Information (Graphical Format){% endblock %}
+
+{% block content %}
+
+<h1>Data Information </h1>
+
+<div id="container"
+    style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<!-- Include Highcharts library -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+</figure>
+<hr>
+<div id="container"></div>
+<!-- Option 1: Bootstrap Bundle with Popper -->
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var data = [
+            {% for year, data in page_obj %}
+            { year: "{{ year }}", max: {{ data.max }}, min: {{ data.min }}, avg: {{ data.avg }} },
+        {% endfor %}
+    ];
+
+    // Sort the data by year in ascending order
+    data.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+    Highcharts.chart('container', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Weather Data'
+        },
+        xAxis: {
+            title: {
+                text: 'Year'
+            },
+            categories: data.map(item => item.year)
+        },
+        yAxis: {
+            title: {
+                text: 'Value'
+            }
+        },
+        series: [{
+            name: 'Max Parameter Value',
+            data: data.map(item => parseFloat(item.max))
+        }, {
+            name: 'Min Parameter Value',
+            data: data.map(item => parseFloat(item.min))
+        }, {
+            name: 'Avg Parameter Value',
+            data: data.map(item => parseFloat(item.avg))
+        }]
+    });
+});
+</script>
+{% endblock %}
