@@ -232,6 +232,93 @@ def get_region_parameter_data(request, region, parameter):
     )
 
 
+
+def data_fetch(request):
+    """
+    To show data by selecting parameter and region from dropdown list
+    """
+    region = request.GET.get('region')
+    parameter = request.GET.get('parameter')
+    print("at line 224", region)
+    print("at line 225", parameter)
+
+    years = Year.objects.all()
+    year_list = [year for year in years] 
+    
+    regions = Region.objects.all()
+    parameters = Parameter.objects.all()
+    
+    queryset_annual = AnnualData.objects.filter(params__name=parameter, region__name=region)
+    queryset_monthly = MonthlyData.objects.filter(params__name=parameter, region__name=region)
+    queryset_season = SeasonalData.objects.filter(params__name=parameter, region__name=region)
+
+    data = {}
+
+    # Concatenating Monthly Data
+    for monthly_data in queryset_monthly:    
+        if monthly_data.year.year not in data:
+            print("at line 178", monthly_data.year.year)
+            data[monthly_data.year.year] = {}
+        if 'monthly' not in data[monthly_data.year.year]:
+            data[monthly_data.year.year]['monthly'] = {}
+        data[monthly_data.year.year]['monthly'][monthly_data.month.name] = monthly_data.value
+
+    # Concatenating Seasonal Data
+    for season_data in queryset_season:
+        if season_data.year.year not in data:
+            data[season_data.year.year] = {}
+        if 'seasonal' not in data[season_data.year.year]:
+            data[season_data.year.year]['seasonal'] = {}
+        data[season_data.year.year]['seasonal'][season_data.season.name] = season_data.value
+
+    # Concatenating Annual Data
+    for annual_data in queryset_annual:    
+        if annual_data.year.year not in data:
+            data[annual_data.year.year] = {}
+        data[annual_data.year.year]['annual'] = annual_data.value
+
+    ranges = []
+    avg_values_rounded = []
+
+   # Calculate and print min, max, and average for each year
+    for year, year_data in data.items():
+        all_values = list(year_data['monthly'].values())
+        min_value = min(all_values)
+        max_value = max(all_values)
+        avg_value = mean(all_values)
+        avg_value_rounded = round(avg_value, 2)
+        print(f"Year: {year}, Min: {min_value}, Max: {max_value}, Avg: {avg_value_rounded}")
+
+        # Concatenate min, max, and avg to the data dictionary
+        data[year]['min'] = min_value
+        data[year]['max'] = max_value
+        data[year]['avg'] = avg_value_rounded
+        avg_values_rounded.append(avg_value_rounded)
+
+        ranges.append([min_value, max_value])
+
+    avg_values_rounded_list = list(avg_values_rounded)
+   
+    context = {
+    'regions': regions,
+    'parameters': parameters,
+    'data':data,
+    'min_values': [min_value for item in data.values()],
+    'max_values': [max_value for item in data.values()],
+    'avg_values': [avg_value_rounded for item in data.values()]
+    }
+
+    paginator = Paginator(list(data.items()), 5)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+  
+    return render(request, 'merge_page.html', {
+        'years': year_list,
+        'ranges': ranges,
+        'context':context,
+        'page_obj':page_obj,
+    })
+
 def create_month_choices():
     months = [
         "jan",

@@ -36,10 +36,11 @@
         <tr>
             <td>{{year}}</td>
             {% for month, value in data.monthly.items %}
-            <td>{{ value }}</td>
+                <td>{{ value }}</td>
             {% endfor %}
+
             {% for season, value in data.seasonal.items %}
-            <td>{{ value }}</td>
+                <td>{{ value }}</td>
             {% endfor %}
             <td>{{ data.annual }}</td>
             <td>{{ data.max }}</td>
@@ -50,24 +51,23 @@
         {% endfor %}
     </tbody>
 </table>
+
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
-        <a href="?page=1" class="page-link">&laquo; First</a>
-        <a href="?page={{ page_obj.previous_page_number }}"
-            class="page-link">Previous</a>
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page=1">&laquo; First</a>
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
 
-        <span class="current-page">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
         </span>
 
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}"
-            class="page-link">Next</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}"
-            class="page-link">Last &raquo;</a>
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
         {% endif %}
+
     </span>
 </div>
 

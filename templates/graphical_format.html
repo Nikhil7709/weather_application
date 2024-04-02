@@ -16,6 +16,7 @@
     <div id="container"></div>
 </figure>
 <hr>
+{{context.data.item}}
 <div id="container"></div>
 <!-- Option 1: Bootstrap Bundle with Popper -->
 <script
@@ -25,11 +26,13 @@
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var data = [
-            {% for year, data in page_obj %}
-            { year: "{{ year }}", max: {{ data.max }}, min: {{ data.min }}, avg: {{ data.avg }} },
+    var data = [
+        {% for year, year_data in context.data.items %}
+            { year: "{{ year }}", max: {{ year_data.max }}, min: {{ year_data.min }}, avg: {{ year_data.avg }} },
         {% endfor %}
     ];
+
+   
 
     // Sort the data by year in ascending order
     data.sort((a, b) => parseInt(a.year) - parseInt(b.year));

@@ -6,29 +6,27 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <label for="regionSelect" class="form-label">Select Region:</label>
-            <select id="regionSelect" class="form-select">
-                <option selected disabled>Select Region</option>
-                {% for region in regions %}
-                <option value="{{ region.id }}">{{ region.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label for="parameterSelect" class="form-label">Select
-                Parameter:</label>
-            <select id="parameterSelect" class="form-select">
-                <option selected disabled>Select Parameter</option>
-                {% for parameter in parameters %}
-                <option value="{{ parameter.id }}">{{ parameter.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <form id="weatherForm" method="GET" action="{% url 'data_fetch' %}">
+                <label for="regionSelect" class="form-label">Select Region:</label>
+                <select id="regionSelect" class="form-select" name="region">
+                    <option value="" disabled {% if not request.GET.region %} selected {% endif %}>Select Region</option>
+                    {% for region in context.regions %}
+                        <option value="{{ region.name }}" {% if region.name == request.GET.region %} selected {% endif %}>{{ region.name }}</option>
+                    {% endfor %}
+                </select>
 
-        <div class="col-md-6 mt-3">
-            <button type="submit" class="btn btn-primary">
-                Submit
-            </button>
+                <label for="parameterSelect" class="form-label">Select Parameter:</label>
+                <select id="parameterSelect" class="form-select" name="parameter">
+                    <option value="" disabled {% if not request.GET.parameter %} selected {% endif %}>Select Parameter</option>
+                    {% for parameter in context.parameters %}
+                        <option value="{{ parameter.name }}" {% if parameter.name == request.GET.parameter %} selected {% endif %}>{{ parameter.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="col-md-6 mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -55,22 +53,62 @@
 </div>
 
 <script>
-    // Function to toggle the visibility of tabular data
     document.getElementById('showTabularData').addEventListener('click', function () {
         var tabularData = document.getElementById('tabularData');
         var graphicalData = document.getElementById('graphicalData');
         
         tabularData.style.display = 'block';
         graphicalData.style.display = 'none';
+        
+        // Handle form submission
+        handleFormSubmission();
     });
-
-    // Function to toggle the visibility of graphical data
+    
+    // Function to toggle the visibility of graphical data and handle form submission
     document.getElementById('showGraphicalData').addEventListener('click', function () {
         var tabularData = document.getElementById('tabularData');
         var graphicalData = document.getElementById('graphicalData');
         
         tabularData.style.display = 'none';
         graphicalData.style.display = 'block';
+        
+        // Handle form submission
+        handleFormSubmission();
+    });
+
+    // Function to handle form submission
+    function handleFormSubmission() {
+        // Get selected region and parameter
+        var regionSelect = document.getElementById('regionSelect');
+        var parameterSelect = document.getElementById('parameterSelect');
+        var selectedRegion = regionSelect.options[regionSelect.selectedIndex].text;
+        var selectedParameter = parameterSelect.options[parameterSelect.selectedIndex].text;
+
+        // Display selected region and parameter in the fields
+        document.getElementById('selectedRegion').textContent = selectedRegion;
+        document.getElementById('selectedParameter').textContent = selectedParameter;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var regionSelect = document.getElementById("regionSelect");
+        var parameterSelect = document.getElementById("parameterSelect");
+
+        // If selected value is not the default one, keep it visible
+        if (regionSelect.value !== "") {
+            regionSelect.style.color = "black";
+        }
+        if (parameterSelect.value !== "") {
+            parameterSelect.style.color = "black";
+        }
+
+        // Event listener to change color when selecting an option
+        regionSelect.addEventListener("change", function() {
+            regionSelect.style.color = "black";
+        });
+
+        parameterSelect.addEventListener("change", function() {
+            parameterSelect.style.color = "black";
+        });
     });
 </script>
 {% endblock %}
