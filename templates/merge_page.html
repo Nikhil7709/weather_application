@@ -2,7 +2,6 @@
 
 {% block content %}
 <h1 class="mb-4">Weather Data</h1>
-
 <div class="container">
     <div class="row">
         <div class="col-md-6">
@@ -53,43 +52,17 @@
 </div>
 
 <script>
-    document.getElementById('showTabularData').addEventListener('click', function () {
+    document.addEventListener("DOMContentLoaded", function() {
         var tabularData = document.getElementById('tabularData');
         var graphicalData = document.getElementById('graphicalData');
-        
+
+        // Show tabular data by default
         tabularData.style.display = 'block';
         graphicalData.style.display = 'none';
-        
+
         // Handle form submission
         handleFormSubmission();
-    });
-    
-    // Function to toggle the visibility of graphical data and handle form submission
-    document.getElementById('showGraphicalData').addEventListener('click', function () {
-        var tabularData = document.getElementById('tabularData');
-        var graphicalData = document.getElementById('graphicalData');
-        
-        tabularData.style.display = 'none';
-        graphicalData.style.display = 'block';
-        
-        // Handle form submission
-        handleFormSubmission();
-    });
 
-    // Function to handle form submission
-    function handleFormSubmission() {
-        // Get selected region and parameter
-        var regionSelect = document.getElementById('regionSelect');
-        var parameterSelect = document.getElementById('parameterSelect');
-        var selectedRegion = regionSelect.options[regionSelect.selectedIndex].text;
-        var selectedParameter = parameterSelect.options[parameterSelect.selectedIndex].text;
-
-        // Display selected region and parameter in the fields
-        document.getElementById('selectedRegion').textContent = selectedRegion;
-        document.getElementById('selectedParameter').textContent = selectedParameter;
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
         var regionSelect = document.getElementById("regionSelect");
         var parameterSelect = document.getElementById("parameterSelect");
 
@@ -110,5 +83,41 @@
             parameterSelect.style.color = "black";
         });
     });
+
+    document.getElementById('showTabularData').addEventListener('click', function () {
+        var tabularData = document.getElementById('tabularData');
+        var graphicalData = document.getElementById('graphicalData');
+
+        tabularData.style.display = 'block';
+        graphicalData.style.display = 'none';
+
+        // Handle form submission
+        handleFormSubmission();
+    });
+
+    document.getElementById('showGraphicalData').addEventListener('click', function () {
+        var tabularData = document.getElementById('tabularData');
+        var graphicalData = document.getElementById('graphicalData');
+
+        tabularData.style.display = 'none';
+        graphicalData.style.display = 'block';
+
+        // Handle form submission
+        handleFormSubmission();
+    });
+
+    // Function to handle form submission
+    function handleFormSubmission() {
+        // Get selected region and parameter
+        var regionSelect = document.getElementById('regionSelect');
+        var parameterSelect = document.getElementById('parameterSelect');
+        var selectedRegion = regionSelect.options[regionSelect.selectedIndex].text;
+        var selectedParameter = parameterSelect.options[parameterSelect.selectedIndex].text;
+
+        // Display selected region and parameter in the fields
+        document.getElementById('selectedRegion').textContent = selectedRegion;
+        document.getElementById('selectedParameter').textContent = selectedParameter;
+    }
 </script>
+
 {% endblock %}

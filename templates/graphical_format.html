@@ -1,22 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Data Information (Graphical Format){% endblock %}
+{% block title %}Data Information{% endblock %}
 
 {% block content %}
 
-<h1>Data Information </h1>
+<h2>Data Information in Graphical Format </h2>
 
 <div id="container"
     style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
 <!-- Include Highcharts library -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
-
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <figure class="highcharts-figure">
     <div id="container"></div>
 </figure>
-<hr>
 {{context.data.item}}
+<hr>
 <div id="container"></div>
 <!-- Option 1: Bootstrap Bundle with Popper -->
 <script
@@ -32,15 +36,60 @@
         {% endfor %}
     ];
 
-   
+    // var data = [
+    //     {% for year, year_data in page_obj %}
+    //         { year: "{{ year }}", max: {{ year_data.max }}, min: {{ year_data.min }}, avg: {{ year_data.avg }} },
+    //     {% endfor %}
+    // ];
+
+    // var data = [
+    //     {% if context.parameter == 'Rainfall' %}
+    //         {% for year, year_data in page_obj %}
+    //             { year: "{{ year }}", max: {{ year_data.max }}, min: {{ year_data.min }}, avg: {{ year_data.avg }} },
+    //         {% endfor %}
+    //     {% else %}
+    //         {% for year, year_data in context.data.items %}
+    //             { year: "{{ year }}", max: {{ year_data.max }}, min: {{ year_data.min }}, avg: {{ year_data.avg }} },
+    //         {% endfor %}
+    //     {% endif %}
+    // ];
 
     // Sort the data by year in ascending order
     data.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+    var parameter = "{{ context.parameter }}"; 
+
+    // Define the chart type based on the parameter
+    var chartType = parameter === "Rainfall" ? 'column' : 'line';
+
+    // // Extract the range of values for the y-axis
+    // var yMin = Math.min.apply(Math, data.map(function(o) { return o.min; }));
+    // var yMax = Math.max.apply(Math, data.map(function(o) { return o.max; }));
+
+        // Extract the range of years
+    var minYear = parseInt(data[0].year);
+    var maxYear = parseInt(data[data.length - 1].year);
+    var yearDiff = maxYear - minYear;
+
+
+        // Define the chart type based on the parameter
+
+        // Define the chart type based on the parameter
+    var chartType;
+    if ("{{ context.parameter }}" === "Rainfall") {
+        chartType = 'column';
+    } else {
+        chartType = 'line';
+    }
 
     Highcharts.chart('container', {
+        // chart: {
+        //     type: 'line'
+        // },
         chart: {
-            type: 'line'
+            type: chartType,
+            zoomType: 'x' // Enable zooming horizontally
         },
+
         title: {
             text: 'Weather Data'
         },
@@ -48,13 +97,30 @@
             title: {
                 text: 'Year'
             },
-            categories: data.map(item => item.year)
+            categories: data.map(item => item.year),
+            // tickInterval: 50
+            zoomType: 'x'
         },
         yAxis: {
             title: {
                 text: 'Value'
-            }
+            },
+            // tickInterval: 0.01
+            // tickInterval: 2   
         },
+        rangeSelector: {
+            enabled: true
+        },
+        plotOptions: {
+        column: {
+            // pointPadding: 0.2,
+            pointPadding: 2,
+
+            borderWidth: 0
+        }
+    },
+
+        
         series: [{
             name: 'Max Parameter Value',
             data: data.map(item => parseFloat(item.max))

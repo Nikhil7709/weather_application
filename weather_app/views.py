@@ -67,8 +67,6 @@ def fetch_data_view(request):
 
                     # Get seasonal data for the current year
                     seasonal_data = seasonal_data_dict.get(year)
-                    print("at line 54", seasonal_data)
-
                     if seasonal_data and len(seasonal_data) >= 16:
 
                         seasonal_data = [
@@ -148,7 +146,6 @@ def get_region_parameter_data(request, region, parameter):
     # Concatenating Monthly Data
     for monthly_data in queryset_monthly:
         if monthly_data.year.year not in data:
-            print("at line 178", monthly_data.year.year)
             data[monthly_data.year.year] = {}
         if "monthly" not in data[monthly_data.year.year]:
             data[monthly_data.year.year]["monthly"] = {}
@@ -231,17 +228,25 @@ def get_region_parameter_data(request, region, parameter):
         },
     )
 
+# def concatenate_data(queryset, data_type, data):
+#     for data_entry in queryset:
+#         if data_entry.year.year not in data:
+#             data[data_entry.year.year] = {}
+#         if data_type not in data[data_entry.year.year]:
+#             data[data_entry.year.year][data_type] = {}
+#         if data_type == 'annual':
+#             data[data_entry.year.year][data_type] = data_entry.value
+#         else:
+#             data[data_entry.year.year][data_type][getattr(data_entry, data_type).name] = data_entry.value
+
 
 
 def data_fetch(request):
-    """
-    To show data by selecting parameter and region from dropdown list
-    """
+
+    # To show data by selecting parameter and region from dropdown list
+
     region = request.GET.get('region')
     parameter = request.GET.get('parameter')
-    print("at line 224", region)
-    print("at line 225", parameter)
-
     years = Year.objects.all()
     year_list = [year for year in years] 
     
@@ -254,10 +259,14 @@ def data_fetch(request):
 
     data = {}
 
+    # concatenate_data(queryset_monthly, 'monthly', data)
+    # concatenate_data(queryset_season, 'seasonal', data)
+    # concatenate_data(queryset_annual, 'annual', data)
+
+
     # Concatenating Monthly Data
     for monthly_data in queryset_monthly:    
         if monthly_data.year.year not in data:
-            print("at line 178", monthly_data.year.year)
             data[monthly_data.year.year] = {}
         if 'monthly' not in data[monthly_data.year.year]:
             data[monthly_data.year.year]['monthly'] = {}
@@ -305,10 +314,11 @@ def data_fetch(request):
     'data':data,
     'min_values': [min_value for item in data.values()],
     'max_values': [max_value for item in data.values()],
-    'avg_values': [avg_value_rounded for item in data.values()]
+    'avg_values': [avg_value_rounded for item in data.values()],
+    'parameter': parameter,
     }
 
-    paginator = Paginator(list(data.items()), 5)  
+    paginator = Paginator(list(data.items()), 10)  
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
   
@@ -343,5 +353,6 @@ def create_month_choices():
 @receiver(post_migrate)
 def post_migrate_handler(sender, **kwargs):
     if sender.name == "weather_app":
-        print("weather-app")
-        create_month_choices()
+        if not Month.objects.exists():
+            print("weather-app")
+            create_month_choices()
