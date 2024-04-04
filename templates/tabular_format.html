@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Data Information {% endblock %}
+
+{% block content %}
+<h2>Data Information in Tabular Format</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>January</th>
+            <th>February</th>
+            <th>March</th>
+            <th>April</th>
+            <th>May</th>
+            <th>June</th>
+            <th>July</th>
+            <th>August</th>
+            <th>September</th>
+            <th>October</th>
+            <th>November</th>
+            <th>December</th>
+            <th>Winter</th>
+            <th>Spring</th>
+            <th>Summer</th>
+            <th>Autumn</th>
+            <th>Annual</th>
+            <th>Max</th>
+            <th>Min</th>
+            <th>Average</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, data in page_obj %}
+        <tr>
+            <td>{{year}}</td>
+            {% for month, value in data.monthly.items %}
+                <td>{{ value }}</td>
+            {% endfor %}
+
+            {% for season, value in data.seasonal.items %}
+                <td>{{ value }}</td>
+            {% endfor %}
+            <td>{{ data.annual }}</td>
+            <td>{{ data.max }}</td>
+            <td>{{ data.min }}</td>
+            <td>{{ data.avg }}</td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page=1">&laquo; First</a>
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?region={{ request.GET.region }}&parameter={{ request.GET.parameter }}&page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+
+    </span>
+</div>
+
+{% endblock %}
